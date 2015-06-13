@@ -1,0 +1,17 @@
+{
+    "contents" : "a <- read.csv(\"activity.csv\")\ndsum = aggregate(steps ~ date, a, sum)\nhist(dsum$steps, 10, main=\"Total Steps Per Day (10/2 - 11/29)\", xlab=\"Number of Steps\")\nmean(dsum$steps)\nmedian(dsum$steps)\n\nisum = aggregate(steps ~ interval, a, mean)\nitimes = substring(strptime(isum$interval, format=\"%H%M\"), 12,16)\n\nlibrary(strinr)\nitimes = substring(strptime(str_pad(isum$interval, pad=\"0\",4), format=\"%H%M\"), 12,16)\ndf <- data.frame(itimes, isum$steps)\n\nlibrary(ggplot2)\nggplot(df, aes(x=isum$interval, y = isum$steps, group = 1)) + geom_line()\n\nhighest = max(isum$steps)\nmax = subset(isum, steps == highest)\nmax$interval\n\n\nnrow (subset(a,is.na(steps)))\n\n# first make a copy of the original dataset\na2 <- a\n\n#loop through every row and if the number of steps is missing\n#look up the average value for that interval and replace the \n#missing value with the average.\nfor (row in 1:nrow(a2)) {\n  if (is.na(a2[row,]$steps) == TRUE) {\n    # get the interval that is missing the value\n    i <- a2[row,\"interval\"]\n    \n    #determine the average value by looking up in isum\n    iavg = isum[isum$interval == i, \"steps\"]\n    \n    #replace the value\n    a2[row,\"steps\"] <- iavg    \n  }\n}\n\ndsum = aggregate(steps ~ date, a2, sum)\nhist(dsum$steps, 10, main=\"Total Steps Per Day (with na replacement)\", xlab=\"Number of Steps\")\nmean(dsum$steps)\nmedian(dsum$steps)\n\n# Store the day of the week of each date\na2$day.of.week= weekdays(as.Date(a$date))\n#initialize everything to weekdays\na2$day.type = \"weekday\"\n#change Saturdays and Sundays to weekends\na2[a2$day.of.week %in% c(\"Saturday\", \"Sunday\"),]$day.type = \"weekend\"\n\n#reaggregate by interval with the day type included\nisum = aggregate(steps ~ day.type+interval, a2, mean)\nday.f<-factor(a2$day.of.week,levels=c(\"Saturday\", \"Sunday\", \"Monday\",\"Tuesday\",\"Wednedsay\",\"Thursday\",\"Friday\"),\n              labels=c(\"Weekend\", \"Weekend\",\"Weekday\",\"Weekday\",\"Weekday\",\"Weekday\",\"Weekday\")) \n\nlibrary(lattice)\n\nattach(isum)\nxyplot(steps~interval|day.type, type=\"l\",\n       xlab = \"Interval\", ylab=\"Steps\",\n       main=\"Steps by Interval and Day Type\", \n       layout=c(1,2))\n\n",
+    "created" : 1433759053225.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1207852173",
+    "id" : "8FA0FE77",
+    "lastKnownWriteTime" : 1434114717,
+    "path" : "~/R/RepData_PeerAssessment1/Project 1.R",
+    "project_path" : "Project 1.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}
